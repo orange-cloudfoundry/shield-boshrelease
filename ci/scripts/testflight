@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# change to root of bosh release
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd $DIR/../..
+
+if [[ -z ${BOSH_TARGET} ]]; then
+	echo >&2 "ERROR!"
+	echo >&2 "BOSH_TARGET environment variable not specified."
+	exit 1
+fi
+if [[ -z ${BOSH_USERNAME} ]]; then
+	echo >&2 "ERROR!"
+	echo >&2 "BOSH_USERNAME environment variable not specified."
+	exit 1
+fi
+if [[ -z ${BOSH_PASSWORD} ]]; then
+	echo >&2 "ERROR!"
+	echo >&2 "BOSH_PASSWORD environment variable not specified."
+	exit 1
+fi
+
+cat > ~/.bosh_config << EOF
+---
+aliases:
+  target:
+    bosh-lite: ${BOSH_TARGET}
+auth:
+  ${BOSH_TARGET}:
+    username: ${BOSH_USERNAME}
+    password: ${BOSH_PASSWORD}
+EOF
+bosh target ${BOSH_TARGET}
+
+set -e
+git submodule update --init --recursive --force
+
+manifest=ci/deployments/${DEPLOYMENT:-integration}.yml
+if [[ ! -f ${manifest} ]]; then
+	echo >&2 "ERROR!!"
+	echo >&2 "could not find deployment \`${manifest}\`"
+	exit 1
+fi
+
+deployment_name=$(spruce json ${manifest} | jq -r .name)
+if [[ -z ${deployment_name} ]]; then
+	echo >&2 "ERROR!!"
+	echo >&2 "could not determine name of deployment from \`${manifest}\`"
+	exit 1
+fi
+
+bosh -n delete deployment ${deployment_name} --force   || echo "Continuing..."
+bosh -n create release && bosh upload release --rebase || echo "Continuing..."
+
+echo "director_uuid: $(bosh status --uuid)" >/tmp/director.yml
+spruce merge ${manifest} /tmp/director.yml > /tmp/deploy.yml
+exec bosh -n -d /tmp/deploy.yml deploy

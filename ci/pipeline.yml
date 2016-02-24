@@ -1,0 +1,40 @@
+---
+meta:
+  credentials:
+    github:
+      private_key: (( vault "secret/pipelines/shield-boshrelease/github:private" ))
+
+    bosh:
+      target:   https://10.58.111.49:25555
+      username: admin
+      password: admin
+
+resources:
+  - name: shield-boshrelease.git
+    type: git
+    source:
+      uri: git@github.com:starkandwayne/shield-boshrelease.git
+      branch: pipeline
+      private_key: (( grab meta.credentials.github.private_key ))
+
+jobs:
+  - name: testflight
+    public: true
+    serial: true
+    plan:
+      - get: shield-boshrelease
+        resource: shield-boshrelease.git
+        trigger: true
+      - task: bosh-release
+        config:
+          platform: linux
+          image: docker:///starkandwayne/concourse
+          inputs:
+            - name: shield-boshrelease
+          run:
+            path: ./shield-boshrelease/ci/scripts/testflight
+            args:
+          params:
+            BOSH_TARGET:   (( grab meta.credentials.bosh.target ))
+            BOSH_USERNAME: (( grab meta.credentials.bosh.username ))
+            BOSH_PASSWORD: (( grab meta.credentials.bosh.password ))
