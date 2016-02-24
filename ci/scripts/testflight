@@ -50,8 +50,8 @@ if [[ -z ${deployment_name} ]]; then
 	exit 1
 fi
 
-bosh -n delete deployment ${deployment_name} --force  || echo "Continuing..."
-bosh -n create release --force && bosh upload release || echo "Continuing..."
+bosh -n delete deployment ${deployment_name} --force           || echo "Continuing..."
+bosh -n create release --force && bosh upload release --rebase || echo "Continuing..."
 
 echo "director_uuid: $(bosh status --uuid)" >/tmp/director.yml
 spruce merge ${manifest} /tmp/director.yml > /tmp/deploy.yml
