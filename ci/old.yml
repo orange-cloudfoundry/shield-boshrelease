@@ -1,31 +1,4 @@
-groups:
-- name: build
-  jobs:
-  - testflight
-  - rc
-  - shipit
-- name: version
-  jobs:
-  - patch
-  - minor
-  - major
-
-- name: ci_image
-  jobs:
-  - build-task-image
-
 jobs:
-- name: build-task-image
-  public: true
-  serial: true
-  plan:
-  - get: git-shield-boshrelease
-    trigger: true
-  - put: docker-image
-    params:
-      build: git-shield-boshrelease/ci/ci_image
-
-
 - name: testflight
   public: true
   serial: true
@@ -39,7 +12,7 @@ jobs:
     - task: create-release-and-deploy
       config:
         platform: linux
-        image: {{docker-hub-task-image}}
+        image: docker:///starkandwayne/concourse-go#1.5
         inputs:
         - {name: shield-boshrelease}
         run:
@@ -109,7 +82,7 @@ jobs:
   - task: create-final-release
     config:
       platform: linux
-      image: {{docker-hub-task-image}}
+      image: docker:///starkandwayne/concourse-go#1.5
       inputs:
       - {name: boshrelease, path: shield-boshrelease}
       - {name: version}
@@ -142,6 +115,7 @@ jobs:
         globs: [create-final-release/shield-boshrelease/releases/shield/shield-*.tgz]
 
 resources:
+  # FIXME: move version over to git driver
 - name: version
   type: semver
   source:
@@ -184,11 +158,3 @@ resources:
     regexp: shield-(.*).tgz
     access_key_id: {{pipeline-aws-access-key-id}}
     secret_access_key: {{pipeline-aws-secret-access-key}}
-
-- name: docker-image
-  type: docker-image
-  source:
-    email: {{docker-hub-email}}
-    username: {{docker-hub-username}}
-    password: {{docker-hub-password}}
-    repository: {{docker-create-hub-task-image}}
