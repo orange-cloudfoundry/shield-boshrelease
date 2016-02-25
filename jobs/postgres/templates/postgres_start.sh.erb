@@ -107,8 +107,8 @@ echo "Creating databases..."
     echo "Trying to install citext..."
     set +e
 
-    touch "/var/vcap/file.txt"
-    echo "hello" > /var/vcap/file.txt
+    touch ~/hello.txt
+    echo "hello from the other side" > ~/hello.txt
 
     #If citext extension already exists, do not try to create it.
     if [[ -z $PACKAGE_DIR/bin/psql -U vcap -p $PORT \
