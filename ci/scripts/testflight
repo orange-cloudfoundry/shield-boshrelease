@@ -56,4 +56,5 @@ bosh -n create release --force && bosh -n upload release --rebase || echo "Conti
 
 echo "director_uuid: $(bosh status --uuid)" >/tmp/director.yml
 spruce merge ${manifest} /tmp/director.yml > /tmp/deploy.yml
+
 exec bosh -n -d /tmp/deploy.yml deploy

@@ -65,7 +65,7 @@ properties:
 compilation:
   network: default
   reuse_compilation_vms: true
-  workers: 3
+  workers: 1
 
 update:
   serial: false
