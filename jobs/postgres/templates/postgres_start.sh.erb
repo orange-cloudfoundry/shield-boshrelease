@@ -100,7 +100,7 @@ echo "Creating databases..."
 <% p("databases.databases", []).each do |database| %>
   echo "Trying to create database <%= database["name"] %>..."
   set +e
-  if [[ -z $PACKAGE_DIR/bin/psql -U vcap -d "<%= database["name"] %> " -p $PORT -c "\l" | grep "<%= database["name"] %>" ]]
+  if [[ -z "$(${PACKAGE_DIR}/bin/psql -U vcap -d "<%= database["name"] %> " -p $PORT -c "\l" | grep "<%= database["name"] %>")" ]]
   then
     su - vcap -c "$PACKAGE_DIR/bin/createdb \"<%= database["name"] %>\" -p $PORT"
   fi
@@ -110,14 +110,11 @@ echo "Creating databases..."
     echo "Trying to install citext..."
     set +e
 
-    touch ~/hello.txt
-    echo "hello from the other side" > ~/hello.txt
-
     #If citext extension already exists, do not try to create it.
-    if [[ -z $PACKAGE_DIR/bin/psql -U vcap -p $PORT \
+    if [[ -z "$($PACKAGE_DIR/bin/psql -U vcap -p $PORT \
 	  -d "<%= database["name"] %>" \
           -c "\dx" \
-          | grep "citext" ]] 
+          | grep "citext")" ]] 
     then
 	$PACKAGE_DIR/bin/psql -U vcap -p $PORT \
           -d "<%= database["name"] %>" \
