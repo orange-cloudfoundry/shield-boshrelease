@@ -16,6 +16,8 @@ HOST='0.0.0.0'
 PORT="<%= p("databases.port") %>"
 LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH
 
+echo "Start of Postgres Setup"
+
 if [ -d $DATA_DIR -a -f $STORE_DIR/FLAG_POSTGRES_UPGRADE ]; then
   echo "FAIL: DB upgrade stopped in the middle, manual intervention required, quitting..."
   exit 1
@@ -100,9 +102,12 @@ echo "Creating databases..."
 <% p("databases.databases", []).each do |database| %>
   echo "Trying to create database <%= database["name"] %>..."
   set +e
-  if [[ -z "$(${PACKAGE_DIR}/bin/psql -U vcap -d "<%= database["name"] %> " -p $PORT -c "\l" | grep "<%= database["name"] %>")" ]]
+  if [[ -z "$(${PACKAGE_DIR}/bin/psql -U vcap -d "postgres" -p $PORT -c "\l" | grep "<%= database["name"] %>")" ]]
   then
+    echo "Shield DB not found; Creating Shield Database"
     su - vcap -c "$PACKAGE_DIR/bin/createdb \"<%= database["name"] %>\" -p $PORT"
+  else
+    echo "Shield DB already exists"
   fi
   set -e
 
@@ -116,12 +121,15 @@ echo "Creating databases..."
           -c "\dx" \
           | grep "citext")" ]] 
     then
+        echo "Citext Not Found -- Creating Citext Extension"
 	$PACKAGE_DIR/bin/psql -U vcap -p $PORT \
           -d "<%= database["name"] %>" \
           -c "CREATE EXTENSION citext"
 	$PACKAGE_DIR/bin/psql -U vcap -p $PORT \
           -d "<%= database["name"] %>" \
           -c "CREATE EXTENSION IF NOT EXISTS citext FROM UNPACKAGED"
+    else 
+        echo "Citext Found"
     fi
 
     set -e
@@ -135,3 +143,4 @@ echo "Creating databases..."
     <% end %>
   <% end %>
 <% end %>
+echo "End of Postgres setup"

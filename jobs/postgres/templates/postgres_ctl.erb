@@ -17,6 +17,8 @@ PIDFILE=$RUN_DIR/postgres.pid
 
 source /var/vcap/packages/common/utils.sh
 
+echo "Start of Postgres_CLT"
+
 case "$1" in
   start)
     if [ -d $DATA_DIR_OLD -a -f $DATA_DIR_OLD/postgresql.conf ]; then
@@ -69,3 +71,5 @@ case "$1" in
     ;;
 
 esac
+
+echo "End of Postgres_CLT"
