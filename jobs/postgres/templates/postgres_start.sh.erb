@@ -100,7 +100,10 @@ echo "Creating databases..."
 <% p("databases.databases", []).each do |database| %>
   echo "Trying to create database <%= database["name"] %>..."
   set +e
-  su - vcap -c "$PACKAGE_DIR/bin/createdb \"<%= database["name"] %>\" -p $PORT"
+  if [[ -z $PACKAGE_DIR/bin/psql -U vcap -d "<%= database["name"] %> " -p $PORT -c "\l" | grep "<%= database["name"] %>" ]]
+  then
+    su - vcap -c "$PACKAGE_DIR/bin/createdb \"<%= database["name"] %>\" -p $PORT"
+  fi
   set -e
 
   <% if database["citext"] %>
@@ -121,7 +124,7 @@ echo "Creating databases..."
           -c "CREATE EXTENSION citext"
 	$PACKAGE_DIR/bin/psql -U vcap -p $PORT \
           -d "<%= database["name"] %>" \
-          -c "CREATE EXTENSION citext FROM UNPACKAGED"
+          -c "CREATE EXTENSION IF NOT EXISTS citext FROM UNPACKAGED"
     fi
 
     set -e
