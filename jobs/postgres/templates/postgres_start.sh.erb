@@ -118,7 +118,7 @@ echo "Creating databases..."
           -c "CREATE EXTENSION citext"
 	$PACKAGE_DIR/bin/psql -U vcap -p $PORT \
           -d "<%= database["name"] %>" \
-          -c "CREATE EXTENSION citext FROM UNPACKAGED"
+          -c "CREATE EXTENSION IF NOT EXISTS citext FROM UNPACKAGED"
     fi
 
     set -e
