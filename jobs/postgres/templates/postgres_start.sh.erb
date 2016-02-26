@@ -100,7 +100,10 @@ echo "Creating databases..."
 <% p("databases.databases", []).each do |database| %>
   echo "Trying to create database <%= database["name"] %>..."
   set +e
-  su - vcap -c "$PACKAGE_DIR/bin/createdb \"<%= database["name"] %>\" -p $PORT"
+  if [[ -z $PACKAGE_DIR/bin/psql -U vcap -p $PORT -c "\l" | grep "shielddb"]]
+  then
+    su - vcap -c "$PACKAGE_DIR/bin/createdb \"<%= database["name"] %>\" -p $PORT"
+  fi
   set -e
 
   <% if database["citext"] %>
