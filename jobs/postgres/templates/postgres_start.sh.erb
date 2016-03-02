@@ -81,8 +81,14 @@ echo "Creating roles..."
   # TODO remove unused roles automatically
   # Default permissions are: nosuperuser nologin inherit nocreatedb.
   # Will fail if role already exists, which is OK
-  $PACKAGE_DIR/bin/psql -U vcap -p $PORT -d postgres \
-                        -c "CREATE ROLE \"<%= role["name"] %>\""
+  if [[ -z "$($PACKAGE_DIR/bin/psql -U vcap -p $PORT \
+	  -d postgres \
+          -c "\du" \
+          | grep <%= role["name"] %>)" ]] 
+  then
+      $PACKAGE_DIR/bin/psql -U vcap -p $PORT -d postgres \
+          -c "CREATE ROLE \"<%= role["name"] %>\""
+  fi
   set -e
 
   echo "Setting password for role <%= role["name"] %>..."
