@@ -1,7 +1,7 @@
 ---
 name: xtrabackup
 packages:
-  - xtrabackup
+  - xtrabackup-2.4.5
 
 templates:
   ignore: ignore

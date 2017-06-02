@@ -1,5 +1,5 @@
 ---
-name: xtrabackup
+name: xtrabackup-2.4.5
 
 dependencies:
   - mariadb
