@@ -18,7 +18,8 @@ case $1 in
       if_p("autoprovision") do |endpoint|
         if endpoint.to_s == "true"
           domain = p("domain", link('shield-daemon').instances.first.address)
-          endpoint = "https://#{domain}"
+          port = link('shield-daemon').p('port')
+          endpoint = "https://#{domain}:#{port}"
         end
     -%>
     curl -Lks "<%= endpoint %>/v1/meta/pubkey" -m 20 >> $AUTHKEYS || true

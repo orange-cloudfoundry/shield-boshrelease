@@ -20,7 +20,8 @@ end
     if endpoint.to_s == "true"
       api_key = link('shield-daemon').p('auth.api_keys').values.first
       domain = p("domain", link('shield-daemon').instances.first.address)
-      endpoint = "https://#{domain}"
+      port = link('shield-daemon').p('port')
+      endpoint = "https://#{domain}:#{port}"
     else
       api_key = p('provisioning_key')
     end
