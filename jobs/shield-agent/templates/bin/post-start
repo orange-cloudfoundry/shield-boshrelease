@@ -87,7 +87,10 @@ cat <<EOF | provision '<%= format_name(name) %>' policy
 EOF
 <% end -%>
 
-<% p('targets', {}).each do |name, target| -%>
+<% p('targets', {}).each do |name, target|
+     (target["config"] || {}).each do |key, val|
+       target["config"][key] = format_name(val) if val.is_a? String
+     end -%>
 cat <<EOF | provision '<%= format_name(target["name"] || name) %>' target
 {"name":     "<%= format_name(target["name"] || name) %>",
  "plugin":   "<%= target["plugin"] %>",
