@@ -6,6 +6,7 @@ SHIELD_CONFIG=$(mktemp --tmpdir auto.XXXXXX)
 trap "rm -rf ${SHIELD_CONFIG}" INT TERM QUIT EXIT
 <%
 def format_name(name)
+   return nil if name.nil?
    result = name.gsub("(deployment)", spec.deployment)
    result.gsub!("(index)", spec.index.to_s)
    result.gsub!("(ip)", spec.ip)
