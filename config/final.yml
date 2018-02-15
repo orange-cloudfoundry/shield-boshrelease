@@ -2,5 +2,6 @@
 blobstore:
   provider: s3
   options:
-    bucket_name: shield-boshrelease
+    bucket_name: gk-shield-boshrelease
+    region: eu-west-3
 final_name: shield
