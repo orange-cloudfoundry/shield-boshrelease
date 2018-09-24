@@ -31,9 +31,9 @@ postgres/postgresql-9.4.5.tar.gz:
   object_id: ba9bd647-c953-4f90-adc5-85a9fa7b394e
   sha: 5278d04093f3cb2e00796fae15b2e33406844d01
 shield/shield-server-linux-amd64-0.10.10.tar.gz:
-  size: 44594296
-  object_id: 7d6aac0c-3410-4113-5130-4db4bff62c8e
-  sha: 7d88de0bc22484560a0340a8d5588bc650c5ff20
+  size: 46569239
+  object_id: 95694c1f-be99-4f58-5b6d-ebf8b99752e9
+  sha: 2eb0506627afe614437c871bfe97234813029f21
 tar/libarchive-3.1.2.tar.gz:
   size: 4527540
   object_id: 82d11f2c-1a0d-4b68-9915-bb80feb10a74
